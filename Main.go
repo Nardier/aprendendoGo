@@ -5,10 +5,18 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
+type livraria struct {
+	livro, autor, genero string
+}
+
 func main() {
+
 	livraria := []string{"Nardier", "Barbosa", "de", "Lira", "Sampaio"}
+
 	for {
 		opcaoMenu := menu()
 
@@ -118,4 +126,10 @@ func limpaTela() {
 	c := exec.Command("clear")
 	c.Stdout = os.Stdout
 	c.Run()
+}
+
+func debug() {
+	fmt.Println("Chegou")
+	var any int
+	fmt.Scan(&any)
 }

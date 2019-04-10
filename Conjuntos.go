@@ -1,4 +1,4 @@
-package main
+/* package main
 
 //não completo
 
@@ -104,3 +104,4 @@ func debug(conj []int) {
 	fmt.Println("Capacidade", cap(conj))
 	fmt.Scan(&any)
 }
+*/
