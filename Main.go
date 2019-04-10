@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-
-	_ "github.com/mattn/go-sqlite3"
+	//_ "github.com/mattn/go-sqlite3"
 )
 
-type livraria struct {
-	livro, autor, genero string
+type livroTipo struct {
+	livro, autor, genero                                                  string
+	anoPublicacao, quantidadeEstoque, vendidos, alugados, paginas, edicao int
 }
 
 func main() {
 
-	livraria := []string{"Nardier", "Barbosa", "de", "Lira", "Sampaio"}
+	livrariaSlice := []livroTipo{}
 
 	for {
 		opcaoMenu := menu()
@@ -23,19 +23,20 @@ func main() {
 		switch opcaoMenu {
 		case 1:
 			limpaTela()
-			primeiraOpcao(livraria)
+			primeiraOpcao(livrariaSlice)
 		case 2:
 			limpaTela()
-			segundaOpcao(livraria)
+			segundaOpcao(livrariaSlice)
 		case 3:
 			limpaTela()
-			livraria = terceiraOpcao(livraria)
+			livrariaSlice = append(livrariaSlice, terceiraOpcao())
+			limpaTela()
 		case 4:
 			limpaTela()
-			quartaOpcao(livraria)
+			quartaOpcao(livrariaSlice)
 		case 5:
 			limpaTela()
-			quintaOpcao(livraria)
+			quintaOpcao(livrariaSlice)
 		case 9:
 			limpaTela()
 		case 0:
@@ -63,64 +64,121 @@ func menu() int {
 	return menuOpcao
 }
 
-func primeiraOpcao(livraria []string) {
+func primeiraOpcao(livrariaSlice []livroTipo) {
 	var posicaoLivro int
-	fmt.Println("Selecione a posição do livro de entre 1 e", len(livraria))
+	fmt.Println("Selecione a posição do livro de entre 1 e", len(livrariaSlice))
 	fmt.Scan(&posicaoLivro)
-	posicaoLivro = posicaoLivro - 1
-
-	if posicaoLivro > 5 || posicaoLivro < 0 {
+	if posicaoLivro > len(livrariaSlice) || posicaoLivro == 0 {
 		fmt.Println("Opção inválida")
 	} else {
-		fmt.Println("Nº:", posicaoLivro+1, "Livro ->", livraria[posicaoLivro])
+		posicaoLivro = posicaoLivro - 1
+		layoutDoPrintDoLivroCompleto(livrariaSlice[posicaoLivro])
 	}
 	return
 }
 
-func segundaOpcao(livraria []string) {
-	var i = 1
-	for j := 0; j < len(livraria); j++ {
-		fmt.Println("Nº:", i, "Livro ->", livraria[j])
-		i++
+func segundaOpcao(livrariaSlice []livroTipo) {
+	for j := 0; j < len(livrariaSlice); j++ {
+		layoutDoPrintDoLivroResumido(livrariaSlice[j])
 	}
 }
 
-func quartaOpcao(vet []string) {
-	var posicaoLivro int
-	var novoLivro string
-	fmt.Println("Selecione a posição do livro de entre 1 e 5 para sobrescrever")
+func quartaOpcao(livrariaSlice []livroTipo) {
+	var posicaoLivro, opcaoEditar, valorGenericoInt int
+	var valorGenericoString string
+	fmt.Println("Selecione a posição do livro para editar")
 	fmt.Scan(&posicaoLivro)
-	posicaoLivro = posicaoLivro - 1
-
-	if posicaoLivro > len(vet) {
+	fmt.Println("Digite qual o codigo correspondente ao elemento à editar")
+	fmt.Println("1-Livro, 2-Autor, 3-Genero, 4-Publicacao, 5-quantidadeEstoque, 6-vendidos, 7-alugados, 8-paginas, 9-edicao")
+	fmt.Scan(&opcaoEditar)
+	if posicaoLivro > len(livrariaSlice) {
 		fmt.Println("Opção inválida")
 	} else {
-		fmt.Println("Digite o novo nome do livro")
-		fmt.Scan(&novoLivro)
-		vet[posicaoLivro] = novoLivro
+		posicaoLivro = posicaoLivro - 1
+		switch opcaoEditar {
+		case 1:
+			fmt.Println("Digite o novo titulo do livro ->")
+			fmt.Scan(&valorGenericoString)
+			livrariaSlice[posicaoLivro].livro = valorGenericoString
+		case 2:
+			fmt.Println("Digite o novo autor do livro ->")
+			fmt.Scan(&valorGenericoString)
+			livrariaSlice[posicaoLivro].autor = valorGenericoString
+		case 3:
+			fmt.Println("Digite o novo genero do livro ->")
+			fmt.Scan(&valorGenericoString)
+			livrariaSlice[posicaoLivro].genero = valorGenericoString
+		case 4:
+			fmt.Println("Digite o novo ano de publicação do livro ->")
+			fmt.Scan(&valorGenericoInt)
+			livrariaSlice[posicaoLivro].anoPublicacao = valorGenericoInt
+		case 5:
+			fmt.Println("Digite o novo estoque do livro ->")
+			fmt.Scan(&valorGenericoInt)
+			livrariaSlice[posicaoLivro].quantidadeEstoque = valorGenericoInt
+		case 6:
+			fmt.Println("Digite a nova quantidade de vendas do livro ->")
+			fmt.Scan(&valorGenericoInt)
+			livrariaSlice[posicaoLivro].vendidos = valorGenericoInt
+		case 7:
+			fmt.Println("Digite a nova quantidade de aluguéis do livro ->")
+			fmt.Scan(&valorGenericoInt)
+			livrariaSlice[posicaoLivro].alugados = valorGenericoInt
+		case 8:
+			fmt.Println("Digite a nova quantidade de páginas do livro ->")
+			fmt.Scan(&valorGenericoInt)
+			livrariaSlice[posicaoLivro].paginas = valorGenericoInt
+		case 9:
+			fmt.Println("Digite a nova edição do livro ->")
+			fmt.Scan(&valorGenericoInt)
+			livrariaSlice[posicaoLivro].edicao = valorGenericoInt
+		default:
+			fmt.Println("Opção inválida!")
+		}
 		fmt.Println("Alterado com sucesso")
 	}
 	return
 }
 
-func terceiraOpcao(livraria []string) []string {
-	var novoLivro string
+func terceiraOpcao() livroTipo {
+	var livroCad, autorCad, generoCad string
+	var anoPublicacaoCad, quantidadeEstoqueCad, paginasCad, edicaoCad int
 	fmt.Println("Digite o nome do livro que deseja cadastrar")
-	fmt.Scan(&novoLivro)
-	livraria = append(livraria, novoLivro)
-	fmt.Println("Alterado com sucesso")
-	return livraria
+	fmt.Scan(&livroCad)
+	fmt.Println("Digite o autor do livro que deseja cadastrar")
+	fmt.Scan(&autorCad)
+	fmt.Println("Digite o genero do livro que deseja cadastrar")
+	fmt.Scan(&generoCad)
+	fmt.Println("Digite o ano de publicacao do livro que deseja cadastrar")
+	fmt.Scan(&anoPublicacaoCad)
+	fmt.Println("Digite a quantidade a cadastrar do livro que deseja cadastrar")
+	fmt.Scan(&quantidadeEstoqueCad)
+	fmt.Println("Digite a quantidade de paginas do livro que deseja cadastrar")
+	fmt.Scan(&paginasCad)
+	fmt.Println("Digite a edicao do livro que deseja cadastrar")
+	fmt.Scan(&edicaoCad)
+	var livro = livroTipo{
+		livro:             livroCad,
+		autor:             autorCad,
+		genero:            generoCad,
+		anoPublicacao:     anoPublicacaoCad,
+		quantidadeEstoque: quantidadeEstoqueCad,
+		paginas:           paginasCad,
+		edicao:            edicaoCad,
+	}
+	return livro
 }
 
-func quintaOpcao(livraria []string) {
-	var posLivro int
-	segundaOpcao(livraria)
+func quintaOpcao(livrariaSlice []livroTipo) {
+	fmt.Println("Pensando ainda como vou implementar")
+	/* var posLivro int
+	//	segundaOpcao(livrariaSlice)
 	fmt.Println("Digite o numero do livro que deseja excluir")
 	fmt.Scan(&posLivro)
 	posLivro = posLivro - 1
-	copy(livraria[posLivro:], livraria[posLivro+1:])
-	livraria[len(livraria)-1] = ""
-	livraria = livraria[:len(livraria)-1]
+	copy(livrariaSlice[posLivro:], livrariaSlice[posLivro+1:])
+	livrariaSlice[len(livrariaSlice)-1] = ""
+	livrariaSlice = livrariaSlice[:len(livrariaSlice)-1] */
 }
 func limpaTela() {
 	c := exec.Command("clear")
@@ -132,4 +190,13 @@ func debug() {
 	fmt.Println("Chegou")
 	var any int
 	fmt.Scan(&any)
+}
+
+func layoutDoPrintDoLivroCompleto(livrariaSlice livroTipo) {
+	fmt.Printf("|Livro|: %s, |Autor|: %s, |Gênero|: %s, |Publicacao(Ano)|: %d, |Estoque|: %d, |Vendidos|: %d, |Alugados|: %d, |Páginas|: %d, |edicao|: %d \n",
+		livrariaSlice.livro, livrariaSlice.autor, livrariaSlice.genero, livrariaSlice.anoPublicacao, livrariaSlice.quantidadeEstoque, livrariaSlice.vendidos,
+		livrariaSlice.alugados, livrariaSlice.paginas, livrariaSlice.edicao)
+}
+func layoutDoPrintDoLivroResumido(livrariaSlice livroTipo) {
+	fmt.Printf("|Livro|: %s, \n", livrariaSlice.livro)
 }
